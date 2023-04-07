@@ -1,0 +1,235 @@
+From 326af4806f91718623470dad00242c6191e9023e Mon Sep 17 00:00:00 2001
+From: Markov Andrei <38224264+markovav-official@users.noreply.github.com>
+Date: Sat, 8 Apr 2023 01:36:35 +0300
+Subject: [PATCH] Removed commands
+
+
+diff --git a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
+index d88c296a..339d5fd5 100644
+--- a/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
++++ b/proxy/src/main/java/net/md_5/bungee/BungeeCord.java
+@@ -24,7 +24,6 @@ import io.netty.util.ResourceLeakDetector;
+ import java.io.File;
+ import java.io.FileReader;
+ import java.io.IOException;
+-import java.io.PrintStream;
+ import java.net.InetSocketAddress;
+ import java.net.SocketAddress;
+ import java.text.Format;
+@@ -77,11 +76,6 @@ import net.md_5.bungee.chat.ScoreComponentSerializer;
+ import net.md_5.bungee.chat.SelectorComponentSerializer;
+ import net.md_5.bungee.chat.TextComponentSerializer;
+ import net.md_5.bungee.chat.TranslatableComponentSerializer;
+-import net.md_5.bungee.command.CommandBungee;
+-import net.md_5.bungee.command.CommandEnd;
+-import net.md_5.bungee.command.CommandIP;
+-import net.md_5.bungee.command.CommandPerms;
+-import net.md_5.bungee.command.CommandReload;
+ import net.md_5.bungee.command.ConsoleCommandSender;
+ import net.md_5.bungee.compress.CompressFactory;
+ import net.md_5.bungee.conf.Configuration;
+@@ -234,11 +228,6 @@ public class BungeeCord extends ProxyServer
+         // Waterfall end
+ 
+         pluginManager = new PluginManager( this );
+-        getPluginManager().registerCommand( null, new CommandReload() );
+-        getPluginManager().registerCommand( null, new CommandEnd() );
+-        getPluginManager().registerCommand( null, new CommandIP() );
+-        getPluginManager().registerCommand( null, new CommandBungee() );
+-        getPluginManager().registerCommand( null, new CommandPerms() );
+ 
+         if ( !Boolean.getBoolean( "net.md_5.bungee.native.disable" ) )
+         {
+diff --git a/proxy/src/main/java/net/md_5/bungee/command/CommandBungee.java b/proxy/src/main/java/net/md_5/bungee/command/CommandBungee.java
+deleted file mode 100644
+index b26035cf..00000000
+--- a/proxy/src/main/java/net/md_5/bungee/command/CommandBungee.java
++++ /dev/null
+@@ -1,21 +0,0 @@
+-package net.md_5.bungee.command;
+-
+-import net.md_5.bungee.api.ChatColor;
+-import net.md_5.bungee.api.CommandSender;
+-import net.md_5.bungee.api.ProxyServer;
+-import net.md_5.bungee.api.plugin.Command;
+-
+-public class CommandBungee extends Command
+-{
+-
+-    public CommandBungee()
+-    {
+-        super( "bungee" );
+-    }
+-
+-    @Override
+-    public void execute(CommandSender sender, String[] args)
+-    {
+-        sender.sendMessage( ChatColor.BLUE + "This server is running Waterfall version " + ProxyServer.getInstance().getVersion() + " by md_5" );
+-    }
+-}
+diff --git a/proxy/src/main/java/net/md_5/bungee/command/CommandEnd.java b/proxy/src/main/java/net/md_5/bungee/command/CommandEnd.java
+deleted file mode 100644
+index 03feeb39..00000000
+--- a/proxy/src/main/java/net/md_5/bungee/command/CommandEnd.java
++++ /dev/null
+@@ -1,32 +0,0 @@
+-package net.md_5.bungee.command;
+-
+-import com.google.common.base.Joiner;
+-import net.md_5.bungee.BungeeCord;
+-import net.md_5.bungee.api.ChatColor;
+-import net.md_5.bungee.api.CommandSender;
+-import net.md_5.bungee.api.plugin.Command;
+-
+-/**
+- * Command to terminate the proxy instance. May only be used by the console by
+- * default.
+- */
+-public class CommandEnd extends Command
+-{
+-
+-    public CommandEnd()
+-    {
+-        super( "end", "bungeecord.command.end" );
+-    }
+-
+-    @Override
+-    public void execute(CommandSender sender, String[] args)
+-    {
+-        if ( args.length == 0 )
+-        {
+-            BungeeCord.getInstance().stop();
+-        } else
+-        {
+-            BungeeCord.getInstance().stop( ChatColor.translateAlternateColorCodes( '&', Joiner.on( ' ' ).join( args ) ) );
+-        }
+-    }
+-}
+diff --git a/proxy/src/main/java/net/md_5/bungee/command/CommandIP.java b/proxy/src/main/java/net/md_5/bungee/command/CommandIP.java
+deleted file mode 100644
+index beba1fa7..00000000
+--- a/proxy/src/main/java/net/md_5/bungee/command/CommandIP.java
++++ /dev/null
+@@ -1,45 +0,0 @@
+-package net.md_5.bungee.command;
+-
+-import java.util.Collections;
+-import net.md_5.bungee.api.CommandSender;
+-import net.md_5.bungee.api.ProxyServer;
+-import net.md_5.bungee.api.chat.ClickEvent;
+-import net.md_5.bungee.api.chat.ComponentBuilder;
+-import net.md_5.bungee.api.connection.ProxiedPlayer;
+-
+-public class CommandIP extends PlayerCommand
+-{
+-
+-    public CommandIP()
+-    {
+-        super( "ip", "bungeecord.command.ip" );
+-    }
+-
+-    @Override
+-    public void execute(CommandSender sender, String[] args)
+-    {
+-        if ( args.length < 1 )
+-        {
+-            sender.sendMessage( ProxyServer.getInstance().getTranslation( "username_needed" ) );
+-            return;
+-        }
+-        ProxiedPlayer user = ProxyServer.getInstance().getPlayer( args[0] );
+-        if ( user == null )
+-        {
+-            sender.sendMessage( ProxyServer.getInstance().getTranslation( "user_not_online" ) );
+-        } else
+-        {
+-            sender.sendMessage( new ComponentBuilder()
+-                    .appendLegacy( ProxyServer.getInstance().getTranslation( "command_ip", user.getName(), user.getSocketAddress() ) )
+-                    .event( new ClickEvent( ClickEvent.Action.COPY_TO_CLIPBOARD, user.getSocketAddress().toString() ) )
+-                    .create()
+-            );
+-        }
+-    }
+-
+-    @Override
+-    public Iterable<String> onTabComplete(CommandSender sender, String[] args)
+-    {
+-        return ( args.length == 1 ) ? super.onTabComplete( sender, args ) : Collections.emptyList();
+-    }
+-}
+diff --git a/proxy/src/main/java/net/md_5/bungee/command/CommandPerms.java b/proxy/src/main/java/net/md_5/bungee/command/CommandPerms.java
+deleted file mode 100644
+index 18422669..00000000
+--- a/proxy/src/main/java/net/md_5/bungee/command/CommandPerms.java
++++ /dev/null
+@@ -1,33 +0,0 @@
+-package net.md_5.bungee.command;
+-
+-import java.util.HashSet;
+-import java.util.Set;
+-import net.md_5.bungee.Util;
+-import net.md_5.bungee.api.CommandSender;
+-import net.md_5.bungee.api.ProxyServer;
+-import net.md_5.bungee.api.plugin.Command;
+-
+-public class CommandPerms extends Command
+-{
+-
+-    public CommandPerms()
+-    {
+-        super( "perms" );
+-    }
+-
+-    @Override
+-    public void execute(CommandSender sender, String[] args)
+-    {
+-        Set<String> permissions = new HashSet<>();
+-        for ( String group : sender.getGroups() )
+-        {
+-            permissions.addAll( ProxyServer.getInstance().getConfigurationAdapter().getPermissions( group ) );
+-        }
+-        sender.sendMessage( ProxyServer.getInstance().getTranslation( "command_perms_groups", Util.csv( sender.getGroups() ) ) );
+-
+-        for ( String permission : permissions )
+-        {
+-            sender.sendMessage( ProxyServer.getInstance().getTranslation( "command_perms_permission", permission ) );
+-        }
+-    }
+-}
+diff --git a/proxy/src/main/java/net/md_5/bungee/command/CommandReload.java b/proxy/src/main/java/net/md_5/bungee/command/CommandReload.java
+deleted file mode 100644
+index 720d0c3b..00000000
+--- a/proxy/src/main/java/net/md_5/bungee/command/CommandReload.java
++++ /dev/null
+@@ -1,29 +0,0 @@
+-package net.md_5.bungee.command;
+-
+-import net.md_5.bungee.BungeeCord;
+-import net.md_5.bungee.api.ChatColor;
+-import net.md_5.bungee.api.CommandSender;
+-import net.md_5.bungee.api.event.ProxyReloadEvent;
+-import net.md_5.bungee.api.plugin.Command;
+-
+-public class CommandReload extends Command
+-{
+-
+-    public CommandReload()
+-    {
+-        super( "greload", "bungeecord.command.reload" );
+-    }
+-
+-    @Override
+-    public void execute(CommandSender sender, String[] args)
+-    {
+-        BungeeCord.getInstance().config.load();
+-        BungeeCord.getInstance().reloadMessages();
+-        BungeeCord.getInstance().stopListeners();
+-        BungeeCord.getInstance().startListeners();
+-        BungeeCord.getInstance().getPluginManager().callEvent( new ProxyReloadEvent( sender ) );
+-
+-        sender.sendMessage( ChatColor.BOLD.toString() + ChatColor.RED.toString() + "Waterfall has been reloaded."
+-                + " This is NOT advisable and you will not be supported with any issues that arise! Please restart Waterfall ASAP." );
+-    }
+-}
+-- 
+2.33.0.windows.2
+
