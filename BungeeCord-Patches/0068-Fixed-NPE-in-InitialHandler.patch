@@ -1,0 +1,22 @@
+From 7a4c15ce539ed2d6278587b4197996f38b7c19aa Mon Sep 17 00:00:00 2001
+From: Markov Andrei <me@markovav.ru>
+Date: Sat, 17 Jun 2023 14:06:56 +0300
+Subject: [PATCH] Fixed NPE in InitialHandler
+
+
+diff --git a/proxy/src/main/java/net/md_5/bungee/connection/InitialHandler.java b/proxy/src/main/java/net/md_5/bungee/connection/InitialHandler.java
+index ca0e3764..93011363 100644
+--- a/proxy/src/main/java/net/md_5/bungee/connection/InitialHandler.java
++++ b/proxy/src/main/java/net/md_5/bungee/connection/InitialHandler.java
+@@ -221,7 +221,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection
+                         {
+                             kickMessage = ChatColor.DARK_BLUE
+                                     + "\00" + 127
+-                                    + '\00' + legacy.getVersion().getName()
++                                    + '\00' + (legacy.getVersion() == null ? "" : legacy.getVersion().getName())
+                                     + '\00' + getFirstLine( legacy.getDescription() )
+                                     + '\00' + ( ( legacy.getPlayers() != null ) ? legacy.getPlayers().getOnline() : "-1" )
+                                     + '\00' + ( ( legacy.getPlayers() != null ) ? legacy.getPlayers().getMax() : "-1" );
+-- 
+2.39.1.windows.1
+
